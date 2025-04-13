@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
 
   const years = [...new Set(carData.map(car => car.year))].sort().reverse();
+  
+  yearSelect.innerHTML = '<option value="">Vehicle Year</option>';
 
   years.forEach(year => {
     const option = document.createElement('option');
