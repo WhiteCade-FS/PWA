@@ -23,12 +23,6 @@ function getRandomPairs(count: number): string[] {
   return [...selected, ...selected].sort(() => Math.random() - .5);
 }
 
-const generateCards = () => {
-  const values = ['\u{1F0A1}', '\u{1F0AE}', '\u{1F0AD}'];
-  cardValues = [...values, ...values];
-  cardValues.sort(() => Math.random() - 0.5);
-};
-
 const createCard =(value: string): HTMLElement => {
   const card = document.createElement('div');
   card.className = 'card';
