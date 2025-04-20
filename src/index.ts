@@ -36,7 +36,6 @@ const showCards = () => {
   grid.innerHTML = '';
   matchedCards = [];
   flippedCards = []
-  generateCards();
   cardValues.forEach(value => {
     const card = createCard(value);
     grid.appendChild(card);
