@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixiJS Border Bounce Assignment</title>
+    <style>
+     #gameArea {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  #game {
+    margin-right: 10px;
+  }
+
+  #borderTracker {
+    font-size: 20px;
+    color: #ffffff;
+    background-color: #2d3436;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 150px;
+    text-align: center;
+  }
+
+  #buttonContainer {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  #restartButton {
+    background-color: #00b894; 
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+   
+  }
+
+  #restartButton:hover {
+    background-color: #019874; 
+  }
+</style>
+</head>
+<body>
+ <div id="gameArea">
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <div id="game"></div>
+    <div id="buttonContainer">
+      <button id="restartButton" style="display:none;">Restart Game</button>
+    </div>
+  </div>
+  <div id="borderTracker">
+    Borders Hit: 0/4
+  </div>
+</div>
+  <script src="https://pixijs.download/release/pixi.min.js"></script>
+
+  <script type="module">
+    const app = new PIXI.Application();
+    await app.init({
+      backgroundColor: "#3398b9",
+      width: 800,
+      height: 800,
+    });
+    document.getElementById('game').appendChild(app.canvas);
+
+    const radius = 5;
+    const circle = new PIXI.Graphics();
+    circle.beginFill(0xf5ef42);
+    circle.drawCircle(0, 0, radius);
+    circle.endFill();
+    circle.x = 400;
+    circle.y = 400;
+    app.stage.addChild(circle);
+
+    function updateBorderTracker() {
+      const count = Object.values(hitBorders).filter(hit => hit).length;
+      document.getElementById('borderTracker').innerText = `Borders Hit: ${count}/4`;
+     }
+  
+    const borders = {
+      top: createBorder(0, 0, 800, 10, 0xff0000),
+      right: createBorder(790, 0, 10, 800, 0xff0000),
+      bottom: createBorder(0, 790, 800, 10, 0xff0000),
+      left: createBorder(0, 0, 10, 800, 0xff0000),
+    };
+
+    for (const side in borders) {
+      app.stage.addChild(borders[side]);
+    }
+
+    const hitBorders = {
+      top: false,
+      right: false,
+      bottom: false,
+      left: false,
+    };
+
+    let xv = (Math.random() * 1.5) + 1;
+    let yv = (Math.random() * 1) + 1;
+
+    xv *= Math.random() < 0.5 ? 1 : -1;
+    yv *= Math.random() < 0.5 ? 1 : -1;
+    
+    const checkAllBordersHit = () => {
+      return Object.values(hitBorders).every(hit => hit);
+    };
+
+    
+    function redrawBorder(border, width, height) {
+      border.clear();
+      border.beginFill(0x00ff00);
+      border.drawRect(0, 0, width, height);
+      border.endFill();
+    }
+
+
+    const borderHit = new Promise((resolve) => {
+      app.ticker.add(() => {
+        circle.x += xv;
+        circle.y += yv;
+
+      if (circle.x + radius >= 790) {
+        circle.x = 790 - 5;
+        xv = -xv;
+        if (!hitBorders.right) {
+        hitBorders.right = true;
+        redrawBorder(borders.right, 10, 800);
+        updateBorderTracker();
+          }
+        }
+
+        if (circle.x - radius <= 10) {
+          circle.x = 10 + 5
+          xv = -xv;
+          if (!hitBorders.left) {
+            hitBorders.left = true;
+            redrawBorder(borders.left, 10, 800);
+            updateBorderTracker();
+          }
+        }
+
+        if (circle.y + radius >= 790) {
+          circle.y = 790 - 5;
+          yv = -yv;
+          if (!hitBorders.bottom) { 
+           hitBorders.bottom = true;
+           redrawBorder(borders.bottom, 800, 10);
+           updateBorderTracker();
+          }
+        }
+
+        if (circle.y - radius <= 10) {
+          circle.y = 10 + 5;
+          yv = -yv;
+          if (!hitBorders.top){
+            hitBorders.top = true;
+            redrawBorder(borders.top, 800, 10);
+            updateBorderTracker();
+          }
+        }
+
+
+        if (checkAllBordersHit()) {
+          resolve();
+        }
+      });
+    });
+
+
+    borderHit.then(() => {
+      app.ticker.stop();
+      alert('All borders have been hit! Game Complete!');
+      document.getElementById('restartButton').style.display = 'block';
+    });
+
+    document.getElementById('restartButton').addEventListener('click', () => {
+      location.reload();
+    });
+
+
+    function createBorder(x, y, width, height, color) {
+      const border = new PIXI.Graphics();
+      border.beginFill(color);
+      border.drawRect(0, 0, width, height);
+      border.endFill();
+      border.x = x;
+      border.y = y;
+      return border;
+    }
+
+  </script>
+</body>
+</html>
+
